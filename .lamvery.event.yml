@@ -1,0 +1,6 @@
+rules:
+- name: twitter_bot_rate_15min
+  description: CloudWatchEvent for cookpad bot
+  schedule: rate(15 minutes)
+  targets:
+  - id: cookpad_recipe
