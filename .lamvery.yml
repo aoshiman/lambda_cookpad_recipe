@@ -1,7 +1,7 @@
 profile: default
 region: ap-northeast-1
 versioning: false
-default_alias: null
+default_alias: prod
 clean_build: false
 configuration:
   name: lambda_cookpad_recipe
