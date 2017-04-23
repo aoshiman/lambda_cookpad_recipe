@@ -2,11 +2,12 @@
 
 from __future__ import print_function, unicode_literals
 from twython import Twython, TwythonError
+from mastodon import Mastodon
 import requests
 from bs4 import BeautifulSoup
 from boto3 import Session
-from setting import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
-                     ACCESS_SECRET, UA, DOMAIN, END_POINT, BUCKET)
+#  from setting import config as cfg
+from setting import UA, DOMAIN, END_POINT, CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET, MSTDN_CONSUMER_KEY, MSTDN_ACCESS_KEY, MSTDN_BASE_URL, BUCKET
 
 
 def get_recipes():
@@ -48,6 +49,11 @@ def tweet_recipe():
                       ACCESS_SECRET
                       )
 
+    mastodon = Mastodon(client_id=MSTDN_CONSUMER_KEY,
+                        access_token=MSTDN_ACCESS_KEY,
+                        api_base_url=MSTDN_BASE_URL
+                        )
+
     recipes = get_recipes()
     try:
         recipe_list = get_recipe_list(BUCKET)
@@ -59,7 +65,8 @@ def tweet_recipe():
         if num not in recipe_list:
             post = u'{0} {1}'.format(title, DOMAIN + url)
             try:
-                twitter.update_status(status = post)
+                twitter.update_status(status=post)
+                mastodon.status_post(post, visibility='private')
                 print(post)
             except TwythonError as e:
                 print(e)

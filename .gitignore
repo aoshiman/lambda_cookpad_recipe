@@ -3,3 +3,6 @@
 *.pyc
 __pycache__
 .envrc
+consumer_key.txt
+access_key.txt
+config.yml

@@ -3,3 +3,6 @@
 - ^\.lamvery\.secret\.yml$
 - ^\.lamvery\.exclude\.yml$
 - ^\.envrc$
+- ^\.config\.yml$
+- ^\.access_key\.txt$
+- ^\.consumer_key\.txt$
