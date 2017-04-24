@@ -6,13 +6,12 @@ from mastodon import Mastodon
 import requests
 from bs4 import BeautifulSoup
 from boto3 import Session
-#  from setting import config as cfg
-from setting import UA, DOMAIN, END_POINT, CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET, MSTDN_CONSUMER_KEY, MSTDN_ACCESS_KEY, MSTDN_BASE_URL, BUCKET
+from settings import config as cfg
 
 
 def get_recipes():
-    headers = {'User-Agent': UA}
-    response = requests.get(DOMAIN + END_POINT, headers=headers)
+    headers = {'User-Agent': cfg['UA']}
+    response = requests.get(cfg['DOMAIN'] + cfg['END_POINT'], headers=headers)
     soup = BeautifulSoup(response.text, "html.parser")
     recipes = []
     for tag in soup.find_all('a', {'class': 'recipe'}):
@@ -43,27 +42,27 @@ def put_recipe(bucket, keyname):
 def tweet_recipe():
     """OAuth setting and Twit(if recipe is new)"""
     twitter = Twython(
-                      CONSUMER_KEY,
-                      CONSUMER_SECRET,
-                      ACCESS_TOKEN,
-                      ACCESS_SECRET
+                      cfg['CONSUMER_KEY'],
+                      cfg['CONSUMER_SECRET'],
+                      cfg['ACCESS_TOKEN'],
+                      cfg['ACCESS_SECRET']
                       )
 
-    mastodon = Mastodon(client_id=MSTDN_CONSUMER_KEY,
-                        access_token=MSTDN_ACCESS_KEY,
-                        api_base_url=MSTDN_BASE_URL
+    mastodon = Mastodon(client_id=cfg['MSTDN_CONSUMER_KEY'],
+                        access_token=cfg['MSTDN_ACCESS_KEY'],
+                        api_base_url=cfg['MSTDN_BASE_URL']
                         )
 
     recipes = get_recipes()
     try:
-        recipe_list = get_recipe_list(BUCKET)
+        recipe_list = get_recipe_list(cfg['BUCKET'])
     except:
         pass
 
     for recipe in recipes:
         title, url, num = recipe[0], recipe[1], recipe[1].split('/')[2]
         if num not in recipe_list:
-            post = u'{0} {1}'.format(title, DOMAIN + url)
+            post = u'{0} {1}'.format(title, cfg['DOMAIN'] + url)
             try:
                 twitter.update_status(status=post)
                 mastodon.status_post(post, visibility='private')
@@ -71,7 +70,7 @@ def tweet_recipe():
             except TwythonError as e:
                 print(e)
             finally:
-                put_recipe(BUCKET, num)
+                put_recipe(cfg['BUCKET'], num)
 
 
 def lambda_handler(event, context):
